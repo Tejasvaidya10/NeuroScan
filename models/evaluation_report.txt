@@ -1,0 +1,18 @@
+Classification Report:
+                  precision    recall  f1-score   support
+
+    glioma_tumor       1.00      0.17      0.29       100
+meningioma_tumor       0.59      0.90      0.72       115
+        no_tumor       0.61      0.99      0.75       105
+ pituitary_tumor       0.71      0.30      0.42        74
+
+        accuracy                           0.63       394
+       macro avg       0.73      0.59      0.55       394
+    weighted avg       0.72      0.63      0.56       394
+
+
+Confusion Matrix:
+[[ 17  46  30   7]
+ [  0 104   9   2]
+ [  0   1 104   0]
+ [  0  24  28  22]]
