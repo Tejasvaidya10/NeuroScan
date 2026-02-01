@@ -5,6 +5,7 @@ from tensorflow.keras.applications import ResNet50
 def create_model(input_shape=(224, 224, 3), num_classes=4):
     """
     Creates a transfer learning model using ResNet50 for brain tumor classification.
+    Unfreezes the last 20 layers for fine-tuning on MRI images.
 
     Args:
         input_shape (tuple): The shape of the input images (height, width, channels).
@@ -20,8 +21,11 @@ def create_model(input_shape=(224, 224, 3), num_classes=4):
         input_shape=input_shape
     )
 
-    # Freeze the pretrained layers
-    base_model.trainable = False
+    # Freeze all layers except the last 20 — allows fine-tuning on MRI domain
+    for layer in base_model.layers[:-20]:
+        layer.trainable = False
+    for layer in base_model.layers[-20:]:
+        layer.trainable = True
 
     # Build classification head on top
     model = models.Sequential([
@@ -32,8 +36,9 @@ def create_model(input_shape=(224, 224, 3), num_classes=4):
         layers.Dense(num_classes, activation='softmax')
     ])
 
+    # Lower learning rate to avoid destroying pretrained weights during fine-tuning
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )

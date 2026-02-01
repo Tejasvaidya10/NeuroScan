@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+from tensorflow.keras.applications.resnet50 import preprocess_input
 
 def preprocess_image(image, target_size=(224, 224)):
     """
@@ -19,7 +20,7 @@ def preprocess_image(image, target_size=(224, 224)):
     image = image.resize(target_size)
     image_array = np.array(image, dtype=np.float32)
     image_array = np.expand_dims(image_array, axis=0)
-    image_array /= 255.0  # Normalize to [0, 1] range
+    image_array = preprocess_input(image_array)  # ResNet50 ImageNet preprocessing
 
     return image_array
 

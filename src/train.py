@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 import matplotlib.pyplot as plt
 import numpy as np
@@ -37,8 +38,9 @@ def train(data_dir, batch_size=32, epochs=50, img_size=(224, 224)):
         return
 
     # Data Augmentation for training (with 80/20 validation split)
+    # Use ResNet50's preprocessing (ImageNet mean subtraction) instead of 1/255 rescaling
     train_datagen = ImageDataGenerator(
-        rescale=1./255,
+        preprocessing_function=preprocess_input,
         rotation_range=10,
         width_shift_range=0.1,
         height_shift_range=0.1,
@@ -50,7 +52,7 @@ def train(data_dir, batch_size=32, epochs=50, img_size=(224, 224)):
     )
 
     # No augmentation for validation and test
-    test_datagen = ImageDataGenerator(rescale=1./255)
+    test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
 
     # Training generator (80% of Training folder)
     train_generator = train_datagen.flow_from_directory(
@@ -197,7 +199,7 @@ def plot_training_history(history, output_dir='models'):
 
     save_path = os.path.join(output_dir, 'training_history.png')
     plt.savefig(save_path)
-    plt.show()
+    plt.close()
     print(f"Training history plot saved to {save_path}")
 
 
