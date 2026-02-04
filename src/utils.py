@@ -35,7 +35,7 @@ def load_trained_model(model_path):
         tf.keras.Model: The loaded model, or None if loading fails.
     """
     try:
-        model = tf.keras.models.load_model(model_path)
+        model = tf.keras.models.load_model(model_path, compile=False)
         return model
     except (FileNotFoundError, OSError) as e:
         print(f"Error loading model: {e}")

@@ -59,6 +59,15 @@ def load_class_labels(model_dir):
     return DEFAULT_CLASSES
 
 
+def load_calibration(model_dir):
+    """Load threshold calibration from JSON file saved during training."""
+    cal_path = os.path.join(model_dir, 'calibration.json')
+    if os.path.exists(cal_path):
+        with open(cal_path, 'r') as f:
+            return json.load(f)
+    return None
+
+
 def main():
     st.title("NeuroScan")
     st.write("Upload an MRI scan to detect the presence and type of brain tumor.")
@@ -74,9 +83,10 @@ def main():
     else:
         st.sidebar.success("Model loaded successfully.")
 
-    # Load class labels from the same directory as the model
+    # Load class labels and calibration from the same directory as the model
     model_dir = os.path.dirname(model_path)
     classes = load_class_labels(model_dir)
+    calibration = load_calibration(model_dir)
 
     # File Uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
@@ -102,8 +112,14 @@ def main():
                         st.error(f"Error during analysis: {e}")
                         return
 
-                    class_idx = np.argmax(prediction)
-                    confidence = np.max(prediction) * 100
+                    # Apply threshold calibration if available
+                    adjusted = prediction.copy()
+                    if calibration and 'glioma_scale' in calibration:
+                        glioma_idx = calibration['class_names'].index('glioma_tumor')
+                        adjusted[0][glioma_idx] *= calibration['glioma_scale']
+
+                    class_idx = np.argmax(adjusted)
+                    confidence = prediction[0][class_idx] * 100
 
                     result_class = classes[class_idx]
 

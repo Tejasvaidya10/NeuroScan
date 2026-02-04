@@ -95,8 +95,8 @@ Opens at `http://localhost:8501`. Upload an MRI scan and click "Analyze Scan" to
 
 ## Model Architecture
 
-- **Backbone**: ResNet50 (pretrained on ImageNet, frozen)
-- **Head**: GlobalAveragePooling2D → Dense(256, ReLU) → Dropout(0.5) → Dense(4, Softmax)
+- **Backbone**: ResNet50 (pretrained on ImageNet, two-phase fine-tuning)
+- **Head**: GlobalAveragePooling2D → BatchNormalization → Dense(256, ReLU) → Dropout(0.5) → Dense(4, Softmax)
 - **Input Size**: 224 x 224 x 3
 - **Optimizer**: Adam
 - **Loss**: Categorical Crossentropy
